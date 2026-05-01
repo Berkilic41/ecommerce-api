@@ -1,0 +1,58 @@
+# Build outputs
+bin/
+obj/
+[Dd]ebug/
+[Rr]elease/
+[Xx]64/
+[Xx]86/
+[Aa][Rr][Mm]/
+[Aa][Rr][Mm]64/
+artifacts/
+publish/
+out/
+
+# Visual Studio / Rider / VS Code
+.vs/
+.idea/
+.vscode/
+*.user
+*.suo
+*.sln.docstates
+*.userosscache
+
+# Build / NuGet
+*.pdb
+*.dll
+*.exe
+*.nupkg
+*.snupkg
+.nuget/
+packages/
+project.lock.json
+project.fragment.lock.json
+project.assets.json
+
+# Test results
+TestResults/
+[Cc]overage/
+*.coverage
+*.coveragexml
+*.trx
+
+# Logs
+*.log
+logs/
+
+# OS
+.DS_Store
+Thumbs.db
+ehthumbs.db
+Desktop.ini
+
+# Secrets / local config
+*.env
+.env.local
+appsettings.Local.json
+appsettings.*.Development.json
+secrets.json
+.aspnet/
