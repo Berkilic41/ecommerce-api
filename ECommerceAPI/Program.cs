@@ -124,9 +124,12 @@ try
     builder.Services.AddScoped<ICartRepository, CartRepository>();
     builder.Services.AddScoped<IOrderRepository, OrderRepository>();
 
-    // Services — categories wrapped in a memory-cache decorator (read-mostly)
+    // Services — categories and products wrapped in memory-cache decorators (read-mostly)
     builder.Services.AddScoped<IAuthService, AuthService>();
-    builder.Services.AddScoped<IProductService, ProductService>();
+    builder.Services.AddScoped<ProductService>();
+    builder.Services.AddScoped<IProductService>(sp => new CachedProductService(
+        sp.GetRequiredService<ProductService>(),
+        sp.GetRequiredService<Microsoft.Extensions.Caching.Memory.IMemoryCache>()));
     builder.Services.AddScoped<CategoryService>();
     builder.Services.AddScoped<ICategoryService>(sp => new CachedCategoryService(
         sp.GetRequiredService<CategoryService>(),
@@ -141,6 +144,7 @@ try
         options.MessageTemplate = "HTTP {RequestMethod} {RequestPath} → {StatusCode} in {Elapsed:0}ms";
     });
 
+    app.UseMiddleware<CorrelationIdMiddleware>();
     app.UseMiddleware<ExceptionHandlingMiddleware>();
 
     app.UseSwagger();
@@ -154,6 +158,16 @@ try
     app.UseStaticFiles();
 
     app.UseCors();
+    app.Use(async (ctx, next) =>
+    {
+        ctx.Response.Headers["X-Content-Type-Options"] = "nosniff";
+        ctx.Response.Headers["X-Frame-Options"]        = "DENY";
+        ctx.Response.Headers["X-XSS-Protection"]       = "1; mode=block";
+        ctx.Response.Headers["Referrer-Policy"]        = "no-referrer";
+        ctx.Response.Headers["Content-Security-Policy"] =
+            "default-src 'self'; script-src 'self' 'unsafe-inline'; style-src 'self' 'unsafe-inline'; img-src 'self' data:";
+        await next();
+    });
     app.UseRateLimiter();
     app.UseAuthentication();
     app.UseAuthorization();
@@ -171,3 +185,6 @@ finally
 {
     Log.CloseAndFlush();
 }
+
+// Enable WebApplicationFactory in integration tests
+public partial class Program { }
