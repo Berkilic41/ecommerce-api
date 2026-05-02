@@ -4,6 +4,21 @@
 [![License: MIT](https://img.shields.io/badge/License-MIT-yellow.svg)](LICENSE)
 [![.NET 8](https://img.shields.io/badge/.NET-8.0-512BD4)](https://dotnet.microsoft.com/)
 
+## Why I Built This
+
+E-commerce APIs are one of the most common interview topics — and one of the hardest to build correctly. I built this project as a **production-ready reference implementation** that goes beyond the typical tutorial: JWT refresh-token rotation, per-IP rate limiting, memory-cache decorators, structured logging with Serilog, Docker containerisation, and full CI/CD. Every architectural decision (raw ADO.NET over EF, decorator pattern for caching, fixed-window rate limiting) is deliberate and documented.
+
+## 🔑 Technical Highlights
+
+- **JWT auth** — 15-min access token + 7-day refresh token with DB-stored revocation; symmetric HMAC-SHA512 signing
+- **Rate limiting** — 5 req/min per IP on auth endpoints, 30 req/min per user on writes (ASP.NET Core built-in)
+- **Cache decorator** — `CachedCategoryService` and `CachedProductService` implement the Decorator pattern over `IMemoryCache` with write-through invalidation
+- **Health check** — `GET /api/health` probes DB connectivity; returns `{ status, database, timestamp }` with 200/503
+- **Correlation IDs** — Every request gets an `X-Correlation-ID` header injected into Serilog's `LogContext`
+- **36+ tests** — Unit tests (AuthService, CartService, ProductService) + integration tests (WebApplicationFactory, health/auth/products)
+- **CI/CD** — GitHub Actions: build → test → coverage → Docker smoke build
+- **Containerized** — Multi-stage Dockerfile (non-root user) + docker-compose with SQL Server 2022 healthcheck
+
 ASP.NET Core 8 Web API with SQL Server, ADO.NET (no ORM), JWT authentication, and a vanilla JS frontend. Production-ready scaffolding: tests, CI, Docker, structured logging, rate limiting, and caching.
 
 ---
