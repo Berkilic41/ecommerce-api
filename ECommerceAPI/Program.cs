@@ -1,6 +1,8 @@
 using Asp.Versioning;
 using Asp.Versioning.ApiExplorer;
 using ECommerceAPI.Data;
+using FluentValidation;
+using FluentValidation.AspNetCore;
 using ECommerceAPI.Middleware;
 using ECommerceAPI.Repositories;
 using ECommerceAPI.Repositories.Interfaces;
@@ -37,6 +39,10 @@ try
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddMemoryCache();
     builder.Services.AddProblemDetails();
+
+    // ─── FluentValidation ────────────────────────────────────────────────────
+    builder.Services.AddFluentValidationAutoValidation();
+    builder.Services.AddValidatorsFromAssemblyContaining<Program>();
 
     // ─── API Versioning ──────────────────────────────────────────────────────
     builder.Services.AddApiVersioning(options =>
