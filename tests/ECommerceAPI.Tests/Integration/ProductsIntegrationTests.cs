@@ -16,7 +16,7 @@ public class ProductsIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task GET_Products_WithoutAuth_Returns401()
     {
-        var response = await _client.GetAsync("/api/products");
+        var response = await _client.GetAsync("/api/v1/products");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -27,7 +27,7 @@ public class ProductsIntegrationTests : IClassFixture<ECommerceApiFactory>
         _client.DefaultRequestHeaders.Authorization =
             new AuthenticationHeaderValue("Bearer", "invalid.jwt.token");
 
-        var response = await _client.GetAsync("/api/products");
+        var response = await _client.GetAsync("/api/v1/products");
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
     }
@@ -82,7 +82,7 @@ public class ProductsIntegrationTests : IClassFixture<ECommerceApiFactory>
             price = 9.99, stockQuantity = 10, categoryId = 1
         });
 
-        var response = await _client.PostAsync("/api/products",
+        var response = await _client.PostAsync("/api/v1/products",
             new StringContent(body, Encoding.UTF8, "application/json"));
 
         // Regular user (not Admin) should get 403 Forbidden

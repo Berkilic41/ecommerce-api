@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using ECommerceAPI.DTOs;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -7,7 +8,8 @@ using System.Security.Claims;
 namespace ECommerceAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 [Authorize]
 public class OrdersController : ControllerBase
 {

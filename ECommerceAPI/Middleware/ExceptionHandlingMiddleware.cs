@@ -1,5 +1,5 @@
+using Microsoft.AspNetCore.Mvc;
 using System.Net;
-using System.Text.Json;
 
 namespace ECommerceAPI.Middleware;
 
@@ -10,7 +10,7 @@ public class ExceptionHandlingMiddleware
 
     public ExceptionHandlingMiddleware(RequestDelegate next, ILogger<ExceptionHandlingMiddleware> logger)
     {
-        _next = next;
+        _next   = next;
         _logger = logger;
     }
 
@@ -29,18 +29,31 @@ public class ExceptionHandlingMiddleware
 
     private static async Task HandleAsync(HttpContext context, Exception ex)
     {
-        var (code, message) = ex switch
+        var (statusCode, title) = ex switch
         {
-            KeyNotFoundException => (HttpStatusCode.NotFound, ex.Message),
-            UnauthorizedAccessException => (HttpStatusCode.Unauthorized, ex.Message),
-            InvalidOperationException => (HttpStatusCode.BadRequest, ex.Message),
-            ArgumentException => (HttpStatusCode.BadRequest, ex.Message),
-            _ => (HttpStatusCode.InternalServerError, "An unexpected error occurred.")
+            KeyNotFoundException        => (HttpStatusCode.NotFound,            "Not Found"),
+            UnauthorizedAccessException => (HttpStatusCode.Unauthorized,        "Unauthorized"),
+            InvalidOperationException   => (HttpStatusCode.BadRequest,          "Bad Request"),
+            ArgumentException           => (HttpStatusCode.BadRequest,          "Bad Request"),
+            _                           => (HttpStatusCode.InternalServerError, "Internal Server Error")
         };
 
-        context.Response.StatusCode = (int)code;
-        context.Response.ContentType = "application/json";
-        await context.Response.WriteAsync(
-            JsonSerializer.Serialize(new { error = message, statusCode = (int)code }));
+        var detail = statusCode == HttpStatusCode.InternalServerError
+            ? "An unexpected error occurred. Please try again later."
+            : ex.Message;
+
+        var problem = new ProblemDetails
+        {
+            Type     = $"https://httpstatuses.com/{(int)statusCode}",
+            Title    = title,
+            Status   = (int)statusCode,
+            Detail   = detail,
+            Instance = context.Request.Path
+        };
+
+        context.Response.StatusCode  = (int)statusCode;
+        context.Response.ContentType = "application/problem+json";
+
+        await context.Response.WriteAsJsonAsync(problem);
     }
 }

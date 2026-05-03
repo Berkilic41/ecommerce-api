@@ -1,3 +1,4 @@
+using Asp.Versioning;
 using ECommerceAPI.DTOs;
 using ECommerceAPI.Services.Interfaces;
 using Microsoft.AspNetCore.Authorization;
@@ -6,7 +7,8 @@ using Microsoft.AspNetCore.Mvc;
 namespace ECommerceAPI.Controllers;
 
 [ApiController]
-[Route("api/[controller]")]
+[ApiVersion("1.0")]
+[Route("api/v{version:apiVersion}/[controller]")]
 public class CategoriesController : ControllerBase
 {
     private readonly ICategoryService _categories;

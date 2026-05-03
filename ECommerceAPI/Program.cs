@@ -1,3 +1,5 @@
+using Asp.Versioning;
+using Asp.Versioning.ApiExplorer;
 using ECommerceAPI.Data;
 using ECommerceAPI.Middleware;
 using ECommerceAPI.Repositories;
@@ -34,22 +36,35 @@ try
     builder.Services.AddControllers();
     builder.Services.AddEndpointsApiExplorer();
     builder.Services.AddMemoryCache();
+    builder.Services.AddProblemDetails();
+
+    // ─── API Versioning ──────────────────────────────────────────────────────
+    builder.Services.AddApiVersioning(options =>
+    {
+        options.DefaultApiVersion = new ApiVersion(1, 0);
+        options.AssumeDefaultVersionWhenUnspecified = true;
+        options.ReportApiVersions = true;
+    }).AddApiExplorer(options =>
+    {
+        options.GroupNameFormat           = "'v'VVV";
+        options.SubstituteApiVersionInUrl = true;
+    });
 
     builder.Services.AddSwaggerGen(c =>
     {
         c.SwaggerDoc("v1", new OpenApiInfo
         {
-            Title = "Mini E-Commerce API",
-            Version = "v1",
-            Description = "REST API built with ASP.NET Core 8, SQL Server, and ADO.NET"
+            Title       = "Mini E-Commerce API",
+            Version     = "v1",
+            Description = "Production-ready REST API — ASP.NET Core 8, SQL Server, ADO.NET, JWT, Docker"
         });
         c.AddSecurityDefinition("Bearer", new OpenApiSecurityScheme
         {
             Description = "JWT Authorization header. Format: Bearer {token}",
-            Name = "Authorization",
-            In = ParameterLocation.Header,
-            Type = SecuritySchemeType.ApiKey,
-            Scheme = "Bearer"
+            Name        = "Authorization",
+            In          = ParameterLocation.Header,
+            Type        = SecuritySchemeType.ApiKey,
+            Scheme      = "Bearer"
         });
         c.AddSecurityRequirement(new OpenApiSecurityRequirement
         {
@@ -147,6 +162,7 @@ try
     app.UseMiddleware<CorrelationIdMiddleware>();
     app.UseMiddleware<ExceptionHandlingMiddleware>();
 
+    app.UseApiVersioning();
     app.UseSwagger();
     app.UseSwaggerUI(c =>
     {

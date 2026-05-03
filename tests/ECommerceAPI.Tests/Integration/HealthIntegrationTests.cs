@@ -14,7 +14,7 @@ public class HealthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task GET_Health_Returns200OrServiceUnavailable()
     {
-        var response = await _client.GetAsync("/api/health");
+        var response = await _client.GetAsync("/api/v1/health");
 
         // Either healthy (200) or degraded (503) — both are valid responses
         response.StatusCode.Should().BeOneOf(HttpStatusCode.OK, HttpStatusCode.ServiceUnavailable);
@@ -23,7 +23,7 @@ public class HealthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task GET_Health_ReturnsJsonWithStatusField()
     {
-        var response = await _client.GetAsync("/api/health");
+        var response = await _client.GetAsync("/api/v1/health");
         var body     = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);
@@ -34,7 +34,7 @@ public class HealthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task GET_Health_ReturnsJsonWithTimestamp()
     {
-        var response = await _client.GetAsync("/api/health");
+        var response = await _client.GetAsync("/api/v1/health");
         var body     = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);
@@ -44,7 +44,7 @@ public class HealthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task GET_Health_ReturnsJsonWithDatabaseField()
     {
-        var response = await _client.GetAsync("/api/health");
+        var response = await _client.GetAsync("/api/v1/health");
         var body     = await response.Content.ReadAsStringAsync();
 
         using var doc = JsonDocument.Parse(body);

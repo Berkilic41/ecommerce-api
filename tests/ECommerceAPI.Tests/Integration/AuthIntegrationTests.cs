@@ -18,7 +18,7 @@ public class AuthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task POST_Register_WithInvalidEmail_Returns400()
     {
-        var response = await _client.PostAsync("/api/auth/register",
+        var response = await _client.PostAsync("/api/v1/auth/register",
             Json(new { username = "user1", email = "not-an-email", password = "Pass123!" }));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -27,7 +27,7 @@ public class AuthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task POST_Register_WithShortPassword_Returns400()
     {
-        var response = await _client.PostAsync("/api/auth/register",
+        var response = await _client.PostAsync("/api/v1/auth/register",
             Json(new { username = "user2", email = "user2@test.com", password = "123" }));
 
         response.StatusCode.Should().Be(HttpStatusCode.BadRequest);
@@ -36,7 +36,7 @@ public class AuthIntegrationTests : IClassFixture<ECommerceApiFactory>
     [Fact]
     public async Task POST_Login_WithWrongCredentials_Returns401()
     {
-        var response = await _client.PostAsync("/api/auth/login",
+        var response = await _client.PostAsync("/api/v1/auth/login",
             Json(new { email = "nonexistent@test.com", password = "WrongPassword1!" }));
 
         response.StatusCode.Should().Be(HttpStatusCode.Unauthorized);
@@ -48,13 +48,13 @@ public class AuthIntegrationTests : IClassFixture<ECommerceApiFactory>
         var email    = $"flow_{Guid.NewGuid():N}@integration.test";
         var password = "IntegrationPass1!";
 
-        var registerResp = await _client.PostAsync("/api/auth/register",
+        var registerResp = await _client.PostAsync("/api/v1/auth/register",
             Json(new { username = $"u{Guid.NewGuid():N[..8]}", email, password }));
 
         // If DB not available, skip gracefully
         if (!registerResp.IsSuccessStatusCode) return;
 
-        var loginResp = await _client.PostAsync("/api/auth/login",
+        var loginResp = await _client.PostAsync("/api/v1/auth/login",
             Json(new { email, password }));
 
         loginResp.StatusCode.Should().Be(HttpStatusCode.OK);
@@ -74,12 +74,12 @@ public class AuthIntegrationTests : IClassFixture<ECommerceApiFactory>
         var email    = $"dup_{Guid.NewGuid():N}@integration.test";
         var password = "DupPass123!";
 
-        var first = await _client.PostAsync("/api/auth/register",
+        var first = await _client.PostAsync("/api/v1/auth/register",
             Json(new { username = $"u{Guid.NewGuid():N[..8]}", email, password }));
 
         if (!first.IsSuccessStatusCode) return; // DB unavailable
 
-        var second = await _client.PostAsync("/api/auth/register",
+        var second = await _client.PostAsync("/api/v1/auth/register",
             Json(new { username = $"u{Guid.NewGuid():N[..8]}", email, password }));
 
         second.StatusCode.Should().BeOneOf(
