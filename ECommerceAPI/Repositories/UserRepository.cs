@@ -106,6 +106,18 @@ public class UserRepository : IUserRepository
         await cmd.ExecuteNonQueryAsync();
     }
 
+    public async Task UpdatePasswordAsync(int userId, string hash, string salt)
+    {
+        using var conn = _factory.CreateConnection();
+        await conn.OpenAsync();
+        using var cmd = new SqlCommand(
+            "UPDATE Users SET PasswordHash = @Hash, PasswordSalt = @Salt WHERE Id = @Id", conn);
+        cmd.Parameters.AddWithValue("@Hash", hash);
+        cmd.Parameters.AddWithValue("@Salt", salt);
+        cmd.Parameters.AddWithValue("@Id",   userId);
+        await cmd.ExecuteNonQueryAsync();
+    }
+
     private static User MapUser(SqlDataReader r) => new()
     {
         Id = r.GetInt32(0),

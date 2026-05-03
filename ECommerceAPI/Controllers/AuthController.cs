@@ -43,4 +43,24 @@ public class AuthController : ControllerBase
         await _auth.LogoutAsync(request.RefreshToken);
         return NoContent();
     }
+
+    /// <summary>
+    /// Request a password reset email. Always returns 200 regardless of whether
+    /// the email exists (prevents user enumeration).
+    /// </summary>
+    [HttpPost("forgot-password")]
+    public async Task<IActionResult> ForgotPassword([FromBody] ForgotPasswordRequest request)
+    {
+        var baseUrl = $"{Request.Scheme}://{Request.Host}";
+        await _auth.ForgotPasswordAsync(request, baseUrl);
+        return Ok(new { message = "If an account with that email exists, a reset link has been sent." });
+    }
+
+    /// <summary>Reset password using a valid token from the forgot-password email.</summary>
+    [HttpPost("reset-password")]
+    public async Task<IActionResult> ResetPassword([FromBody] ResetPasswordRequest request)
+    {
+        await _auth.ResetPasswordAsync(request);
+        return Ok(new { message = "Password has been reset successfully. You can now log in." });
+    }
 }

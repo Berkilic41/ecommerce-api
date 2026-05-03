@@ -140,10 +140,14 @@ try
 
     // Repositories
     builder.Services.AddScoped<IUserRepository, UserRepository>();
+    builder.Services.AddScoped<IPasswordResetRepository, PasswordResetRepository>();
     builder.Services.AddScoped<IProductRepository, ProductRepository>();
     builder.Services.AddScoped<ICategoryRepository, CategoryRepository>();
     builder.Services.AddScoped<ICartRepository, CartRepository>();
     builder.Services.AddScoped<IOrderRepository, OrderRepository>();
+
+    // Email — swap ConsoleEmailSender for SmtpEmailSender / SendGridEmailSender in production
+    builder.Services.AddScoped<IEmailSender, ConsoleEmailSender>();
 
     // Services — categories and products wrapped in memory-cache decorators (read-mostly)
     builder.Services.AddScoped<IAuthService, AuthService>();

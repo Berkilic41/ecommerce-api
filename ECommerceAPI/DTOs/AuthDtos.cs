@@ -1,5 +1,7 @@
 using System.ComponentModel.DataAnnotations;
 
+// ─── Password Reset DTOs ─────────────────────────────────────────────────────
+
 namespace ECommerceAPI.DTOs;
 
 public record RegisterRequest(
@@ -23,4 +25,14 @@ public record AuthResponse(
     string Username,
     string Email,
     string Role
+);
+
+public record ForgotPasswordRequest(
+    [Required, EmailAddress] string Email
+);
+
+public record ResetPasswordRequest(
+    [Required] string Token,
+    [Required, MinLength(8)] string NewPassword,
+    [Required] string ConfirmPassword
 );

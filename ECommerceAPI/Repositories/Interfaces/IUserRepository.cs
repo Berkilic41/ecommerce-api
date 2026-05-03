@@ -12,4 +12,5 @@ public interface IUserRepository
     Task SaveRefreshTokenAsync(int userId, string token, DateTime expiresAt);
     Task<(int UserId, bool IsRevoked, DateTime ExpiresAt)?> GetRefreshTokenAsync(string token);
     Task RevokeRefreshTokenAsync(string token);
+    Task UpdatePasswordAsync(int userId, string hash, string salt);
 }
